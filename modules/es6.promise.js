@@ -10,6 +10,7 @@ var $                  = require('./_')
   , aFunction          = require('./_a-function')
   , anInstance         = require('./_an-instance')
   , forOf              = require('./_for-of')
+  , from               = require('./_array-from-iterable')
   , setProto           = require('./_set-proto').set
   , speciesConstructor = require('./_species-constructor')
   , task               = require('./_task').set
@@ -254,7 +255,7 @@ $export($export.S + $export.F * !USE_NATIVE, PROMISE, {
     return capability.promise;
   }
 });
-$export($export.S + $export.F * (!USE_NATIVE || testResolve(true)), PROMISE, {
+$export($export.S + $export.F * (LIBRARY || !USE_NATIVE || testResolve(true)), PROMISE, {
   // 25.4.4.6 Promise.resolve(x)
   resolve: function resolve(x){
     // instanceof instead of internal slot check because we should fix it without replacement native Promise core
@@ -273,11 +274,10 @@ $export($export.S + $export.F * !(USE_NATIVE && require('./_iter-detect')(functi
     var C          = this
       , capability = newPromiseCapability(C)
       , resolve    = capability.resolve
-      , reject     = capability.reject
-      , values     = [];
+      , reject     = capability.reject;
     var abrupt = perform(function(){
-      forOf(iterable, false, values.push, values);
-      var remaining = values.length
+      var values    = from(iterable)
+        , remaining = values.length
         , results   = Array(remaining);
       if(remaining)$.each.call(values, function(promise, index){
         var alreadyCalled = false;
