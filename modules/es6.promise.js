@@ -15,10 +15,10 @@ var $          = require('./$')
   , species    = require('./$.species')
   , SPECIES    = require('./$.wks')('species')
   , RECORD     = require('./$.uid')('record')
+  , asap       = require('./$.microtask')
   , PROMISE    = 'Promise'
   , process    = global.process
   , isNode     = classof(process) == 'process'
-  , asap       = process && process.nextTick || require('./$.task').set
   , P          = global[PROMISE]
   , Wrapper;
 
@@ -76,8 +76,7 @@ var notify = function(record, isReject){
   if(record.n)return;
   record.n = true;
   var chain = record.c;
-  // strange IE + webpack dev server bug - use .call(global)
-  asap.call(global, function(){
+  asap(function(){
     var value = record.v
       , ok    = record.s == 1
       , i     = 0;
@@ -102,8 +101,7 @@ var notify = function(record, isReject){
     chain.length = 0;
     record.n = false;
     if(isReject)setTimeout(function(){
-      // strange IE + webpack dev server bug - use .call(global)
-      asap.call(global, function(){
+      asap(function(){
         if(isUnhandled(record.p)){
           if(isNode){
             process.emit('unhandledRejection', value, record.p);
@@ -145,8 +143,7 @@ var $resolve = function(value){
   record = record.r || record; // unwrap
   try {
     if(then = isThenable(value)){
-      // strange IE + webpack dev server bug - use .call(global)
-      asap.call(global, function(){
+      asap(function(){
         var wrapper = {r: record, d: false}; // wrap
         try {
           then.call(value, ctx($resolve, wrapper, 1), ctx($reject, wrapper, 1));
