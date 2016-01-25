@@ -1,1 +1,1 @@
-require('./_set-species')('Array');
+require('./$.species')(Array);

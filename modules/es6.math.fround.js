@@ -1,18 +1,18 @@
 // 20.2.2.16 Math.fround(x)
-var $export   = require('./_export')
-  , sign      = require('./_math-sign')
-  , pow       = Math.pow
+var $def  = require('./$.def')
+  , sign  = require('./$.sign')
+  , pow   = Math.pow
   , EPSILON   = pow(2, -52)
   , EPSILON32 = pow(2, -23)
   , MAX32     = pow(2, 127) * (2 - EPSILON32)
   , MIN32     = pow(2, -126);
 
-var roundTiesToEven = function(n){
+function roundTiesToEven(n){
   return n + 1 / EPSILON - 1 / EPSILON;
-};
+}
 
 
-$export($export.S, 'Math', {
+$def($def.S, 'Math', {
   fround: function fround(x){
     var $abs  = Math.abs(x)
       , $sign = sign(x)

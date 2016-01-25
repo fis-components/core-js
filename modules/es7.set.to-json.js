@@ -1,4 +1,4 @@
 // https://github.com/DavidBruant/Map-Set.prototype.toJSON
-var $export  = require('./_export');
+var $def  = require('./$.def');
 
-$export($export.P + $export.R, 'Set', {toJSON: require('./_collection-to-json')('Set')});
+$def($def.P, 'Set', {toJSON: require('./$.collection-to-json')('Set')});

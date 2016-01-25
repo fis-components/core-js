@@ -1,9 +1,12 @@
-var classof   = require('./_classof')
-  , ITERATOR  = require('./_wks')('iterator')
-  , Iterators = require('./_iterators');
-module.exports = require('./_core').isIterable = function(it){
-  var O = Object(it);
-  return O[ITERATOR] !== undefined
-    || '@@iterator' in O
-    || Iterators.hasOwnProperty(classof(O));
+var global    = require('./$.global')
+  , has       = require('./$.has')
+  , classof   = require('./$.cof').classof
+  , ITERATOR  = require('./$.wks')('iterator')
+  , Iterators = require('./$.iterators');
+module.exports = require('./$.core').isIterable = function(it){
+  var O      = Object(it)
+    , Symbol = global.Symbol;
+  return (Symbol && Symbol.iterator || '@@iterator') in O
+    || ITERATOR in O
+    || has(Iterators, classof(O));
 };

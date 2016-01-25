@@ -1,6 +1,6 @@
-var $export = require('./_export');
+var $def = require('./$.def');
 
-$export($export.P, 'String', {
+$def($def.P, 'String', {
   // 21.1.3.13 String.prototype.repeat(count)
-  repeat: require('./_string-repeat')
+  repeat: require('./$.string-repeat')
 });

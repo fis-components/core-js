@@ -1,20 +1,64 @@
-'use strict';
-var $           = require('./_')
-  , ctx         = require('./_ctx')
-  , $export     = require('./_export')
-  , createDesc  = require('./_property-desc')
-  , assign      = require('./_object-assign')
-  , keyOf       = require('./_keyof')
-  , aFunction   = require('./_a-function')
-  , forOf       = require('./_for-of')
-  , isIterable  = require('./core.is-iterable')
-  , $iterCreate = require('./_iter-create')
-  , step        = require('./_iter-step')
-  , isObject    = require('./_is-object')
-  , toIObject   = require('./_to-iobject')
-  , DESCRIPTORS = require('./_descriptors')
-  , has         = require('./_has')
-  , getKeys     = $.getKeys;
+var $            = require('./$')
+  , ctx          = require('./$.ctx')
+  , $def         = require('./$.def')
+  , createDesc   = require('./$.property-desc')
+  , assign       = require('./$.assign')
+  , keyOf        = require('./$.keyof')
+  , aFunction    = require('./$.a-function')
+  , forOf        = require('./$.for-of')
+  , isIterable   = require('./core.is-iterable')
+  , step         = require('./$.iter-step')
+  , isObject     = require('./$.is-object')
+  , toObject     = require('./$.to-object')
+  , SUPPORT_DESC = require('./$.support-desc')
+  , has          = require('./$.has')
+  , getKeys      = $.getKeys
+  , findKey      = createDictMethod(6);
+
+function Dict(iterable){
+  var dict = $.create(null);
+  if(iterable != undefined){
+    if(isIterable(iterable)){
+      forOf(iterable, true, function(key, value){
+        dict[key] = value;
+      });
+    } else assign(dict, iterable);
+  }
+  return dict;
+}
+Dict.prototype = null;
+
+function DictIterator(iterated, kind){
+  this._t = toObject(iterated); // target
+  this._a = getKeys(iterated);  // keys
+  this._i = 0;                  // next index
+  this._k = kind;               // kind
+}
+require('./$.iter-create')(DictIterator, 'Dict', function(){
+  var that = this
+    , O    = that._t
+    , keys = that._a
+    , kind = that._k
+    , key;
+  do {
+    if(that._i >= keys.length){
+      that._t = undefined;
+      return step(1);
+    }
+  } while(!has(O, key = keys[that._i++]));
+  if(kind == 'keys'  )return step(0, key);
+  if(kind == 'values')return step(0, O[key]);
+  return step(0, [key, O[key]]);
+});
+function createDictIter(kind){
+  return function(it){
+    return new DictIterator(it, kind);
+  };
+}
+function generic(A, B){
+  // strange IE quirks mode bug -> use typeof instead of isFunction
+  return typeof A == 'function' ? A : B;
+}
 
 // 0 -> Dict.forEach
 // 1 -> Dict.map
@@ -24,14 +68,13 @@ var $           = require('./_')
 // 5 -> Dict.find
 // 6 -> Dict.findKey
 // 7 -> Dict.mapPairs
-var createDictMethod = function(TYPE){
+function createDictMethod(TYPE){
   var IS_MAP   = TYPE == 1
     , IS_EVERY = TYPE == 4;
   return function(object, callbackfn, that /* = undefined */){
     var f      = ctx(callbackfn, that, 3)
-      , O      = toIObject(object)
-      , result = IS_MAP || TYPE == 7 || TYPE == 2
-          ? new (typeof this == 'function' ? this : Dict) : undefined
+      , O      = toObject(object)
+      , result = IS_MAP || TYPE == 7 || TYPE == 2 ? new (generic(this, Dict)) : undefined
       , key, val, res;
     for(key in O)if(has(O, key)){
       val = O[key];
@@ -49,53 +92,11 @@ var createDictMethod = function(TYPE){
     }
     return TYPE == 3 || IS_EVERY ? IS_EVERY : result;
   };
-};
-var findKey = createDictMethod(6);
-
-var createDictIter = function(kind){
-  return function(it){
-    return new DictIterator(it, kind);
-  };
-};
-var DictIterator = function(iterated, kind){
-  this._t = toIObject(iterated); // target
-  this._a = getKeys(iterated);   // keys
-  this._i = 0;                   // next index
-  this._k = kind;                // kind
-};
-$iterCreate(DictIterator, 'Dict', function(){
-  var that = this
-    , O    = that._t
-    , keys = that._a
-    , kind = that._k
-    , key;
-  do {
-    if(that._i >= keys.length){
-      that._t = undefined;
-      return step(1);
-    }
-  } while(!has(O, key = keys[that._i++]));
-  if(kind == 'keys'  )return step(0, key);
-  if(kind == 'values')return step(0, O[key]);
-  return step(0, [key, O[key]]);
-});
-
-function Dict(iterable){
-  var dict = $.create(null);
-  if(iterable != undefined){
-    if(isIterable(iterable)){
-      forOf(iterable, true, function(key, value){
-        dict[key] = value;
-      });
-    } else assign(dict, iterable);
-  }
-  return dict;
 }
-Dict.prototype = null;
 
 function reduce(object, mapfn, init){
   aFunction(mapfn);
-  var O      = toIObject(object)
+  var O      = toObject(object)
     , keys   = getKeys(O)
     , length = keys.length
     , i      = 0
@@ -120,7 +121,7 @@ function get(object, key){
   if(has(object, key))return object[key];
 }
 function set(object, key, value){
-  if(DESCRIPTORS && key in Object)$.setDesc(object, key, createDesc(0, value));
+  if(SUPPORT_DESC && key in Object)$.setDesc(object, key, createDesc(0, value));
   else object[key] = value;
   return object;
 }
@@ -129,9 +130,9 @@ function isDict(it){
   return isObject(it) && $.getProto(it) === Dict.prototype;
 }
 
-$export($export.G + $export.F, {Dict: Dict});
+$def($def.G + $def.F, {Dict: Dict});
 
-$export($export.S, 'Dict', {
+$def($def.S, 'Dict', {
   keys:     createDictIter('keys'),
   values:   createDictIter('values'),
   entries:  createDictIter('entries'),

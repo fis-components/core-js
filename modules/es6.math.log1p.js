@@ -1,4 +1,8 @@
 // 20.2.2.20 Math.log1p(x)
-var $export = require('./_export');
+var $def = require('./$.def');
 
-$export($export.S, 'Math', {log1p: require('./_math-log1p')});
+$def($def.S, 'Math', {
+  log1p: function log1p(x){
+    return (x = +x) > -1e-8 && x < 1e-8 ? x - x * x / 2 : Math.log(1 + x);
+  }
+});

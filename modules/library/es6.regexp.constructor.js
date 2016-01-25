@@ -1,1 +1,1 @@
-require('./_set-species')('RegExp');
+require('./$.species')(RegExp);

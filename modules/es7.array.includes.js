@@ -1,12 +1,10 @@
 'use strict';
-var $export   = require('./_export')
-  , $includes = require('./_array-includes')(true);
-
-$export($export.P, 'Array', {
+var $def      = require('./$.def')
+  , $includes = require('./$.array-includes')(true);
+$def($def.P, 'Array', {
   // https://github.com/domenic/Array.prototype.includes
   includes: function includes(el /*, fromIndex = 0 */){
-    return $includes(this, el, arguments.length > 1 ? arguments[1] : undefined);
+    return $includes(this, el, arguments[1]);
   }
 });
-
-require('./_add-to-unscopables')('includes');
+require('./$.unscope')('includes');

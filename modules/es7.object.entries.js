@@ -1,8 +1,8 @@
 // http://goo.gl/XkBrjD
-var $export  = require('./_export')
-  , $entries = require('./_object-to-array')(true);
+var $def     = require('./$.def')
+  , $entries = require('./$.object-to-array')(true);
 
-$export($export.S, 'Object', {
+$def($def.S, 'Object', {
   entries: function entries(it){
     return $entries(it);
   }

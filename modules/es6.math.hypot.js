@@ -1,15 +1,15 @@
 // 20.2.2.17 Math.hypot([value1[, value2[, … ]]])
-var $export = require('./_export')
-  , abs     = Math.abs;
+var $def = require('./$.def')
+  , abs  = Math.abs;
 
-$export($export.S, 'Math', {
+$def($def.S, 'Math', {
   hypot: function hypot(value1, value2){ // eslint-disable-line no-unused-vars
     var sum  = 0
       , i    = 0
-      , aLen = arguments.length
+      , len  = arguments.length
       , larg = 0
       , arg, div;
-    while(i < aLen){
+    while(i < len){
       arg = abs(arguments[i++]);
       if(larg < arg){
         div  = larg / arg;

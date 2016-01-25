@@ -1,9 +1,9 @@
-var global  = require('./_global')
-  , core    = require('./_core')
-  , $export = require('./_export')
-  , partial = require('./_partial');
+var global  = require('./$.global')
+  , core    = require('./$.core')
+  , $def    = require('./$.def')
+  , partial = require('./$.partial');
 // https://esdiscuss.org/topic/promise-returning-delay-function
-$export($export.G + $export.F, {
+$def($def.G + $def.F, {
   delay: function delay(time){
     return new (core.Promise || global.Promise)(function(resolve){
       setTimeout(partial.call(resolve, true), time);

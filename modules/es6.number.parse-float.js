@@ -1,4 +1,4 @@
 // 20.1.2.12 Number.parseFloat(string)
-var $export = require('./_export');
+var $def = require('./$.def');
 
-$export($export.S, 'Number', {parseFloat: parseFloat});
+$def($def.S, 'Number', {parseFloat: parseFloat});

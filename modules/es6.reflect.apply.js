@@ -1,8 +1,8 @@
 // 26.1.1 Reflect.apply(target, thisArgument, argumentsList)
-var $export = require('./_export')
-  , _apply  = Function.apply;
+var $def   = require('./$.def')
+  , _apply = Function.apply;
 
-$export($export.S, 'Reflect', {
+$def($def.S, 'Reflect', {
   apply: function apply(target, thisArgument, argumentsList){
     return _apply.call(target, thisArgument, argumentsList);
   }

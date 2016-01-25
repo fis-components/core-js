@@ -1,12 +1,12 @@
-// 21.1.3.7 String.prototype.includes(searchString, position = 0)
 'use strict';
-var $export  = require('./_export')
-  , context  = require('./_string-context')
-  , INCLUDES = 'includes';
+var defined = require('./$.defined')
+  , cof     = require('./$.cof')
+  , $def    = require('./$.def');
 
-$export($export.P + $export.F * require('./_fails-is-regexp')(INCLUDES), 'String', {
+$def($def.P, 'String', {
+  // 21.1.3.7 String.prototype.includes(searchString, position = 0)
   includes: function includes(searchString /*, position = 0 */){
-    return !!~context(this, searchString, INCLUDES)
-      .indexOf(searchString, arguments.length > 1 ? arguments[1] : undefined);
+    if(cof(searchString) == 'RegExp')throw TypeError("String#includes doesn't accept regex!");
+    return !!~String(defined(this)).indexOf(searchString, arguments[1]);
   }
 });

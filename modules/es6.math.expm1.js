@@ -1,4 +1,4 @@
 // 20.2.2.14 Math.expm1(x)
-var $export = require('./_export');
+var $def = require('./$.def');
 
-$export($export.S, 'Math', {expm1: require('./_math-expm1')});
+$def($def.S, 'Math', {expm1: require('./$.expm1')});

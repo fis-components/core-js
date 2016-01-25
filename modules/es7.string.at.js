@@ -1,9 +1,8 @@
-'use strict';
 // https://github.com/mathiasbynens/String.prototype.at
-var $export = require('./_export')
-  , $at     = require('./_string-at')(true);
-
-$export($export.P, 'String', {
+'use strict';
+var $def = require('./$.def')
+  , $at  = require('./$.string-at')(true);
+$def($def.P, 'String', {
   at: function at(pos){
     return $at(this, pos);
   }
