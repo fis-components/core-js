@@ -1,4 +1,4 @@
 // 19.1.2.7 Object.getOwnPropertyNames(O)
-require('./_object-sap')('getOwnPropertyNames', function(){
-  return require('./_get-names').get;
+require('./$.object-sap')('getOwnPropertyNames', function(){
+  return require('./$.get-names').get;
 });
