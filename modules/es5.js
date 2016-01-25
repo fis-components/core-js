@@ -9,20 +9,18 @@ var $                = require('./$')
   , invoke           = require('./$.invoke')
   , arrayMethod      = require('./$.array-methods')
   , IE_PROTO         = require('./$.uid')('__proto__')
-  , defined          = require('./$.defined')
   , isObject         = require('./$.is-object')
-  , isFunction       = require('./$.is-function')
   , anObject         = require('./$.an-object')
   , aFunction        = require('./$.a-function')
   , toObject         = require('./$.to-object')
   , toInteger        = require('./$.to-integer')
   , toIndex          = require('./$.to-index')
   , toLength         = require('./$.to-length')
+  , ES5Object        = require('./$.es5-object')
   , ObjectProto      = Object.prototype
   , A                = []
   , _slice           = A.slice
   , _join            = A.join
-  , classof          = cof.classof
   , defineProperty   = $.setDesc
   , getOwnDescriptor = $.getDesc
   , defineProperties = $.setDescs
@@ -120,9 +118,9 @@ function Empty(){}
 $def($def.S, 'Object', {
   // 19.1.2.9 / 15.2.3.2 Object.getPrototypeOf(O)
   getPrototypeOf: $.getProto = $.getProto || function(O){
-    O = Object(defined(O));
+    O = toObject(O, true);
     if(has(O, IE_PROTO))return O[IE_PROTO];
-    if(isFunction(O.constructor) && O instanceof O.constructor){
+    if(typeof O.constructor == 'function' && O instanceof O.constructor){
       return O.constructor.prototype;
     } return O instanceof Object ? ObjectProto : null;
   },
@@ -190,13 +188,7 @@ $def($def.P, 'Function', {
   }
 });
 
-// Fix for not array-like ES3 string and DOM objects
-if(!(0 in Object('z') && 'z'[0] == 'z')){
-  $.ES5Object = function(it){
-    return cof(it) == 'String' ? it.split('') : Object(it);
-  };
-}
-
+// fallback for not array-like ES3 strings and DOM objects
 var buggySlice = true;
 try {
   if(html)_slice.call(html);
@@ -220,10 +212,9 @@ $def($def.P + $def.F * buggySlice, 'Array', {
     return cloned;
   }
 });
-
-$def($def.P + $def.F * ($.ES5Object != Object), 'Array', {
+$def($def.P + $def.F * (ES5Object != Object), 'Array', {
   join: function join(){
-    return _join.apply($.ES5Object(this), arguments);
+    return _join.apply(ES5Object(this), arguments);
   }
 });
 
@@ -323,8 +314,3 @@ $def($def.P + $def.F * brokenDate, 'Date', {
       ':' + lz(d.getUTCSeconds()) + '.' + (m > 99 ? m : '0' + lz(m)) + 'Z';
   }
 });
-
-if(classof(function(){ return arguments; }()) == 'Object')cof.classof = function(it){
-  var tag = classof(it);
-  return tag == 'Object' && isFunction(it.callee) ? 'Arguments' : tag;
-};

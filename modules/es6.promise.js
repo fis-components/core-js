@@ -3,10 +3,9 @@ var $          = require('./$')
   , LIBRARY    = require('./$.library')
   , global     = require('./$.global')
   , ctx        = require('./$.ctx')
-  , cof        = require('./$.cof')
+  , classof    = require('./$.classof')
   , $def       = require('./$.def')
   , isObject   = require('./$.is-object')
-  , isFunction = require('./$.is-function')
   , anObject   = require('./$.an-object')
   , aFunction  = require('./$.a-function')
   , strictNew  = require('./$.strict-new')
@@ -18,7 +17,7 @@ var $          = require('./$')
   , RECORD     = require('./$.uid')('record')
   , PROMISE    = 'Promise'
   , process    = global.process
-  , isNode     = cof(process) == 'process'
+  , isNode     = classof(process) == 'process'
   , asap       = process && process.nextTick || require('./$.task').set
   , P          = global[PROMISE]
   , Wrapper;
@@ -37,7 +36,7 @@ var useNative = function(){
     return self;
   }
   try {
-    works = isFunction(P) && isFunction(P.resolve) && testResolve();
+    works = P && P.resolve && testResolve();
     setProto(P2, P);
     P2.prototype = $.create(P.prototype, {constructor: {value: P2}});
     // actual Firefox has broken subclass support, test that
@@ -58,7 +57,7 @@ var useNative = function(){
 
 // helpers
 function isPromise(it){
-  return isObject(it) && (useNative ? cof.classof(it) == 'Promise' : RECORD in it);
+  return isObject(it) && (useNative ? classof(it) == 'Promise' : RECORD in it);
 }
 function sameConstructor(a, b){
   // library wrapper special case
@@ -71,8 +70,7 @@ function getConstructor(C){
 }
 function isThenable(it){
   var then;
-  if(isObject(it))then = it.then;
-  return isFunction(then) ? then : false;
+  return isObject(it) && typeof (then = it.then) == 'function' ? then : false;
 }
 function notify(record, isReject){
   if(record.n)return;
@@ -193,8 +191,8 @@ if(!useNative){
     then: function then(onFulfilled, onRejected){
       var S = anObject(anObject(this).constructor)[SPECIES];
       var react = {
-        ok:   isFunction(onFulfilled) ? onFulfilled : true,
-        fail: isFunction(onRejected)  ? onRejected  : false
+        ok:   typeof onFulfilled == 'function' ? onFulfilled : true,
+        fail: typeof onRejected == 'function'  ? onRejected  : false
       };
       var promise = react.P = new (S != undefined ? S : P)(function(res, rej){
         react.res = aFunction(res);
@@ -215,7 +213,7 @@ if(!useNative){
 
 // export
 $def($def.G + $def.W + $def.F * !useNative, {Promise: P});
-cof.set(P, PROMISE);
+require('./$.tag')(P, PROMISE);
 species(P);
 species(Wrapper = require('./$.core')[PROMISE]);
 

@@ -1,11 +1,9 @@
 'use strict';
-var $               = require('./$')
-  , LIBRARY         = require('./$.library')
+var LIBRARY         = require('./$.library')
   , $def            = require('./$.def')
   , $redef          = require('./$.redef')
   , hide            = require('./$.hide')
   , has             = require('./$.has')
-  , cof             = require('./$.cof')
   , SYMBOL_ITERATOR = require('./$.wks')('iterator')
   , Iterators       = require('./$.iterators')
   , FF_ITERATOR     = '@@iterator'
@@ -15,13 +13,10 @@ function returnThis(){ return this; }
 module.exports = function(Base, NAME, Constructor, next, DEFAULT, IS_SET, FORCE){
   require('./$.iter-create')(Constructor, NAME, next);
   function createMethod(kind){
-    function $$(that){
-      return new Constructor(that, kind);
-    }
     switch(kind){
-      case KEYS: return function keys(){ return $$(this); };
-      case VALUES: return function values(){ return $$(this); };
-    } return function entries(){ return $$(this); };
+      case KEYS: return function keys(){ return new Constructor(this, kind); };
+      case VALUES: return function values(){ return new Constructor(this, kind); };
+    } return function entries(){ return new Constructor(this, kind); };
   }
   var TAG      = NAME + ' Iterator'
     , proto    = Base.prototype
@@ -30,9 +25,9 @@ module.exports = function(Base, NAME, Constructor, next, DEFAULT, IS_SET, FORCE)
     , methods, key;
   // Fix native
   if(_native){
-    var IteratorPrototype = $.getProto(_default.call(new Base));
+    var IteratorPrototype = require('./$').getProto(_default.call(new Base));
     // Set @@toStringTag to native iterators
-    cof.set(IteratorPrototype, TAG, true);
+    require('./$.tag')(IteratorPrototype, TAG, true);
     // FF fix
     if(!LIBRARY && has(proto, FF_ITERATOR))hide(IteratorPrototype, SYMBOL_ITERATOR, returnThis);
   }
