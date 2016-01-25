@@ -11,7 +11,7 @@ var $          = require('./$')
   , strictNew  = require('./$.strict-new')
   , forOf      = require('./$.for-of')
   , setProto   = require('./$.set-proto').set
-  , same       = require('./$.same')
+  , same       = require('./$.same-value')
   , SPECIES    = require('./$.wks')('species')
   , speciesConstructor = require('./$.species-constructor')
   , RECORD     = require('./$.uid')('record')
@@ -44,7 +44,7 @@ var useNative = function(){
       works = false;
     }
     // actual V8 bug, https://code.google.com/p/v8/issues/detail?id=4162
-    if(works && require('./$.support-desc')){
+    if(works && require('./$.descriptors')){
       var thenableThenGotten = false;
       P.resolve($.setDesc({}, 'then', {
         get: function(){ thenableThenGotten = true; }
@@ -212,8 +212,8 @@ if(!useNative){
 
 // export
 $def($def.G + $def.W + $def.F * !useNative, {Promise: P});
-require('./$.tag')(P, PROMISE);
-require('./$.species')(PROMISE);
+require('./$.set-to-string-tag')(P, PROMISE);
+require('./$.set-species')(PROMISE);
 Wrapper = require('./$.core')[PROMISE];
 
 // statics

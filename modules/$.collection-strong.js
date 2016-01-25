@@ -11,10 +11,10 @@ var $            = require('./$')
   , ID           = require('./$.uid')('id')
   , $has         = require('./$.has')
   , isObject     = require('./$.is-object')
-  , setSpecies   = require('./$.species')
-  , SUPPORT_DESC = require('./$.support-desc')
+  , setSpecies   = require('./$.set-species')
+  , DESCRIPTORS  = require('./$.descriptors')
   , isExtensible = Object.isExtensible || isObject
-  , SIZE         = SUPPORT_DESC ? '_s' : 'size'
+  , SIZE         = DESCRIPTORS ? '_s' : 'size'
   , id           = 0;
 
 var fastKey = function(it, create){
@@ -97,7 +97,7 @@ module.exports = {
         return !!getEntry(this, key);
       }
     });
-    if(SUPPORT_DESC)$.setDesc(C.prototype, 'size', {
+    if(DESCRIPTORS)$.setDesc(C.prototype, 'size', {
       get: function(){
         return defined(this[SIZE]);
       }

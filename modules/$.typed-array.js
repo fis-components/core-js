@@ -1,7 +1,7 @@
 'use strict';
 var DEBUG = false;
 
-var DESCRIPTORS        = require('./$.support-desc')
+var DESCRIPTORS        = require('./$.descriptors')
   , global             = require('./$.global')
   , LIBRARY            = require('./$.library')
   , $                  = require('./$')
@@ -16,6 +16,7 @@ var DESCRIPTORS        = require('./$.support-desc')
   , toInteger          = require('./$.to-integer')
   , toLength           = require('./$.to-length')
   , toIndex            = require('./$.to-index')
+  , toPrimitive        = require('./$.to-primitive')
   , isObject           = require('./$.is-object')
   , toObject           = require('./$.to-object')
   , isArrayIter        = require('./$.is-array-iter')
@@ -30,7 +31,7 @@ var DESCRIPTORS        = require('./$.support-desc')
   , $iterators         = require('./es6.array.iterator')
   , Iterators          = require('./$.iterators')
   , $iterDetect        = require('./$.iter-detect')
-  , setSpecies         = require('./$.species')
+  , setSpecies         = require('./$.set-species')
   , $ArrayBuffer       = $buffer.ArrayBuffer
   , $DataView          = $buffer.DataView
   , setDesc            = $.setDesc
@@ -216,14 +217,15 @@ var proto = {
 };
 
 var isTADesc = function(target, key){
-  return isObject(target) && TYPED_ARRAY in target
-    && (typeof key == 'string' || typeof key == 'number') && isInteger(+key); // <- use toPrimitive
+  return isObject(target) && TYPED_ARRAY in target && isInteger(+key);
 };
 var $getDesc = function getOwnPropertyDescriptor(target, key){
-  return isTADesc(target, key) ? propertyDesc(2, target[key]) : getDesc(target, key);
+  return isTADesc(target, key = toPrimitive(key, true))
+    ? propertyDesc(2, target[key])
+    : getDesc(target, key);
 };
 var $setDesc = function defineProperty(target, key, desc){
-  if(isTADesc(target, key) && isObject(desc)){
+  if(isTADesc(target, key = toPrimitive(key, true)) && isObject(desc)){
     if('value' in desc)target[key] = desc.value;
     return target;
   } else return setDesc(target, key, desc);
